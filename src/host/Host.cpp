@@ -39,7 +39,7 @@ using namespace lookups;
 //  Static Class Members
 // ---------------------------------------------------------------------------
 
-std::mutex Host::m_clockingMutex;
+Mutex Host::m_clockingMutex;
 
 uint8_t Host::m_activeTickDelay = 5U;
 uint8_t Host::m_idleTickDelay = 5U;
@@ -960,7 +960,7 @@ int Host::run()
 
                 LogMessage(LOG_HOST, "CW, start transmitting");
                 m_isTxCW = true;
-                std::lock_guard<std::mutex> lock(m_clockingMutex);
+                LockGuard lock(m_clockingMutex);
 
                 setState(STATE_IDLE);
                 m_modem->sendCWId(m_cwCallsign);
@@ -1637,7 +1637,7 @@ void* Host::threadModem(void* arg)
 
             // scope is intentional
             {
-                std::lock_guard<std::mutex> lock(m_clockingMutex);
+                LockGuard lock(m_clockingMutex);
 
                 // ------------------------------------------------------
                 //  -- Modem Clocking                                 --

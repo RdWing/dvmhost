@@ -175,8 +175,8 @@ void ModemV24::clock(uint32_t ms)
         case CMD_P25_DATA:
         {
             if (m_p25Enabled) {
-                std::lock_guard<std::mutex> lock(m_p25ReadLock);
-            
+                LockGuard lock(m_p25ReadLock);
+
                 // convert data from V.24/DFSI formatting to TIA-102 air formatting
                 convertToAir(m_buffer + (cmdOffset + 1U), m_length - (cmdOffset + 1U));
             }
@@ -186,7 +186,7 @@ void ModemV24::clock(uint32_t ms)
         case CMD_P25_LOST:
         {
             if (m_p25Enabled) {
-                std::lock_guard<std::mutex> lock(m_p25ReadLock);
+                LockGuard lock(m_p25ReadLock);
 
                 if (m_rspDoubleLength) {
                     LogError(LOG_MODEM, "CMD_P25_LOST double length?; len = %u", m_length);

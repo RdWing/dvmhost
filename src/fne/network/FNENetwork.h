@@ -31,13 +31,13 @@
 #include "common/lookups/RadioIdLookup.h"
 #include "common/lookups/TalkgroupRulesLookup.h"
 #include "common/lookups/PeerListLookup.h"
+#include "common/Mutex.h"
 #include "fne/network/influxdb/InfluxDB.h"
 #include "host/network/Network.h"
 
 #include <string>
 #include <cstdint>
 #include <unordered_map>
-#include <mutex>
 
 // ---------------------------------------------------------------------------
 //  Class Prototypes
@@ -417,7 +417,7 @@ namespace network
 
         NET_CONN_STATUS m_status;
 
-        static std::mutex m_peerMutex;
+        static Mutex m_peerMutex;
         typedef std::pair<const uint32_t, network::FNEPeerConnection*> PeerMapPair;
         std::unordered_map<uint32_t, FNEPeerConnection*> m_peers;
         typedef std::pair<const uint32_t, lookups::AffiliationLookup*> PeerAffiliationMapPair;

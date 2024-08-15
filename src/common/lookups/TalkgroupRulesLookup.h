@@ -27,7 +27,6 @@
 #include "common/Utils.h"
 
 #include <string>
-#include <mutex>
 #include <unordered_map>
 #include <vector>
 
@@ -586,7 +585,7 @@ namespace lookups
 
         bool m_acl;
 
-        static std::mutex m_mutex;
+        static Mutex m_mutex;
         bool m_stop;
 
         /**

@@ -24,7 +24,7 @@ using namespace lookups;
 //  Static Class Members
 // ---------------------------------------------------------------------------
 
-std::mutex RadioIdLookup::m_mutex;
+Mutex RadioIdLookup::m_mutex;
 
 // ---------------------------------------------------------------------------
 //  Public Class Members
@@ -42,7 +42,7 @@ RadioIdLookup::RadioIdLookup(const std::string& filename, uint32_t reloadTime, b
 
 void RadioIdLookup::clear()
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    LockGuard lock(m_mutex);
     m_table.clear();
 }
 
@@ -64,7 +64,7 @@ void RadioIdLookup::addEntry(uint32_t id, bool enabled, const std::string& alias
 
     RadioId entry = RadioId(enabled, false, alias, ipAddress);
 
-    std::lock_guard<std::mutex> lock(m_mutex);
+    LockGuard lock(m_mutex);
     try {
         RadioId _entry = m_table.at(id);
         // if either the alias or the enabled flag doesn't match, update the entry
@@ -85,7 +85,7 @@ void RadioIdLookup::addEntry(uint32_t id, bool enabled, const std::string& alias
 
 void RadioIdLookup::eraseEntry(uint32_t id)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    LockGuard lock(m_mutex);
     try {
         RadioId entry = m_table.at(id); // this value will get discarded
         (void)entry;                    // but some variants of C++ mark the unordered_map<>::at as nodiscard
@@ -105,7 +105,7 @@ RadioId RadioIdLookup::find(uint32_t id)
         return RadioId(true, false);
     }
 
-    std::lock_guard<std::mutex> lock(m_mutex);
+    LockGuard lock(m_mutex);
     try {
         entry = m_table.at(id);
     } catch (...) {
@@ -150,7 +150,7 @@ bool RadioIdLookup::load()
     // clear table
     clear();
 
-    std::lock_guard<std::mutex> lock(m_mutex);
+    LockGuard lock(m_mutex);
 
     // read lines from file
     std::string line;
@@ -233,7 +233,7 @@ bool RadioIdLookup::save()
     // Counter for lines written
     unsigned int lines = 0;
 
-    std::lock_guard<std::mutex> lock(m_mutex);
+    LockGuard lock(m_mutex);
 
     // String for writing
     std::string line;

@@ -20,6 +20,7 @@
 #define __LOOKUP_TABLE_H__
 
 #include "common/Defines.h"
+#include "common/Mutex.h"
 #include "common/Thread.h"
 #include "common/Timer.h"
 
@@ -27,7 +28,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <cctype>
-#include <mutex>
 #include <unordered_map>
 
 namespace lookups

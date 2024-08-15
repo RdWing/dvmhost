@@ -28,13 +28,13 @@
 
 #include "Defines.h"
 #include "common/RingBuffer.h"
+#include "common/Mutex.h"
 #include "common/Timer.h"
 #include "modem/port/IModemPort.h"
 #include "network/RESTAPI.h"
 
 #include <string>
 #include <functional>
-#include <mutex>
 
 /**
  * @addtogroup modem
@@ -789,10 +789,10 @@ namespace modem
         bool m_lockout;
         bool m_error;
 
-        std::mutex m_dmr1ReadLock;
-        std::mutex m_dmr2ReadLock;
-        std::mutex m_p25ReadLock;
-        std::mutex m_nxdnReadLock;
+        Mutex m_dmr1ReadLock;
+        Mutex m_dmr2ReadLock;
+        Mutex m_p25ReadLock;
+        Mutex m_nxdnReadLock;
 
         bool m_ignoreModemConfigArea;
         bool m_flashDisabled;

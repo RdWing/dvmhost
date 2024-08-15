@@ -38,7 +38,7 @@ const uint32_t MAX_RID_LIST_CHUNK = 50U;
 //  Static Class Members
 // ---------------------------------------------------------------------------
 
-std::mutex FNENetwork::m_peerMutex;
+Mutex FNENetwork::m_peerMutex;
 
 // ---------------------------------------------------------------------------
 //  Public Class Members
@@ -1245,7 +1245,7 @@ void FNENetwork::createPeerAffiliations(uint32_t peerId, std::string peerName)
 {
     erasePeerAffiliations(peerId);
 
-    std::lock_guard<std::mutex> lock(m_peerMutex);
+    LockGuard lock(m_peerMutex);
     lookups::ChannelLookup* chLookup = new lookups::ChannelLookup();
     m_peerAffiliations[peerId] = new lookups::AffiliationLookup(peerName, chLookup, m_verbose);
     m_peerAffiliations[peerId]->setDisableUnitRegTimeout(true); // FNE doesn't allow unit registration timeouts (notification must come from the peers)
@@ -1255,7 +1255,7 @@ void FNENetwork::createPeerAffiliations(uint32_t peerId, std::string peerName)
 
 bool FNENetwork::erasePeerAffiliations(uint32_t peerId)
 {
-    std::lock_guard<std::mutex> lock(m_peerMutex);
+    LockGuard lock(m_peerMutex);
     auto it = std::find_if(m_peerAffiliations.begin(), m_peerAffiliations.end(), [&](PeerAffiliationMapPair x) { return x.first == peerId; });
     if (it != m_peerAffiliations.end()) {
         lookups::AffiliationLookup* aff = m_peerAffiliations[peerId];
@@ -1277,7 +1277,7 @@ bool FNENetwork::erasePeerAffiliations(uint32_t peerId)
 
 bool FNENetwork::erasePeer(uint32_t peerId)
 {
-    std::lock_guard<std::mutex> lock(m_peerMutex);
+    LockGuard lock(m_peerMutex);
     {
         auto it = std::find_if(m_peers.begin(), m_peers.end(), [&](PeerMapPair x) { return x.first == peerId; });
         if (it != m_peers.end()) {
@@ -1327,7 +1327,7 @@ bool FNENetwork::resetPeer(uint32_t peerId)
 
 std::string FNENetwork::resolvePeerIdentity(uint32_t peerId)
 {
-    std::lock_guard<std::mutex> lock(m_peerMutex);
+    LockGuard lock(m_peerMutex);
     auto it = std::find_if(m_peers.begin(), m_peers.end(), [&](PeerMapPair x) { return x.first == peerId; });
     if (it != m_peers.end()) {
         if (it->second != nullptr) {

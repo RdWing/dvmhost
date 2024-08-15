@@ -16,9 +16,9 @@
 #define __REST_HTTP__SERVER_CONNECTION_MANAGER_H__
 
 #include "common/Defines.h"
+#include "common/Mutex.h"
 
 #include <set>
-#include <mutex>
 
 namespace network
 {
@@ -55,8 +55,9 @@ namespace network
                  */
                 void start(ConnectionPtr c)
                 {
-                    std::lock_guard<std::mutex> guard(m_lock);
+                    // scope is intentional
                     {
+                        LockGuard lock(m_lock);
                         m_connections.insert(c);
                     }
                     c->start();
@@ -68,8 +69,9 @@ namespace network
                  */
                 void stop(ConnectionPtr c)
                 {
-                    std::lock_guard<std::mutex> guard(m_lock);
+                    // scope is intentional
                     {
+                        LockGuard lock(m_lock);
                         m_connections.erase(c);
                     }
                     c->stop();
@@ -83,13 +85,13 @@ namespace network
                     for (auto c : m_connections)
                         c->stop();
 
-                    std::lock_guard<std::mutex> guard(m_lock);
+                    LockGuard lock(m_lock);
                     m_connections.clear();
                 }
 
             private:
                 std::set<ConnectionPtr> m_connections;
-                std::mutex m_lock;
+                Mutex m_lock;
             };
         } // namespace http
     } // namespace rest

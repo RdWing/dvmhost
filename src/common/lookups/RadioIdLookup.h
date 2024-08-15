@@ -208,7 +208,7 @@ namespace lookups
         bool save() override;
 
     private:
-        static std::mutex m_mutex;
+        static Mutex m_mutex;
     };
 } // namespace lookups
 

@@ -23,6 +23,7 @@
 #include "common/network/udp/Socket.h"
 #include "common/yaml/Yaml.h"
 #include "common/RingBuffer.h"
+#include "common/Mutex.h"
 #include "common/Timer.h"
 #include "vocoder/MBEDecoder.h"
 #include "vocoder/MBEEncoder.h"
@@ -34,7 +35,6 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <mutex>
 
 #if defined(_WIN32)
 #define WIN32_LEAN_AND_MEAN
@@ -213,8 +213,8 @@ private:
     bool m_running;
     bool m_debug;
 
-    static std::mutex m_audioMutex;
-    static std::mutex m_networkMutex;
+    static Mutex m_audioMutex;
+    static Mutex m_networkMutex;
 
 #if defined(_WIN32)
     void* m_decoderState;

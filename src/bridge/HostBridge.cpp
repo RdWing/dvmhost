@@ -59,8 +59,8 @@ const int NUMBER_OF_BUFFERS = 32;
 //  Static Class Members
 // ---------------------------------------------------------------------------
 
-std::mutex HostBridge::m_audioMutex;
-std::mutex HostBridge::m_networkMutex;
+Mutex HostBridge::m_audioMutex;
+Mutex HostBridge::m_networkMutex;
 
 // ---------------------------------------------------------------------------
 //  Global Functions
@@ -78,7 +78,7 @@ void audioCallback(ma_device* device, void* output, const void* input, ma_uint32
 
     // capture input audio
     if (frameCount > 0U) {
-        std::lock_guard<std::mutex> lock(HostBridge::m_audioMutex);
+        LockGuard lock(HostBridge::m_audioMutex);
 
         int smpIdx = 0;
         short samples[MBE_SAMPLES_LENGTH];
@@ -491,7 +491,7 @@ int HostBridge::run()
 
         if (m_network != nullptr)
         {
-            std::lock_guard<std::mutex> lock(HostBridge::m_networkMutex);
+            LockGuard lock(HostBridge::m_networkMutex);
             m_network->clock(ms);
         }
 
@@ -996,16 +996,19 @@ void HostBridge::processUDPAudio()
 
         m_udpDstId = m_dstId;
 
-        std::lock_guard<std::mutex> lock(m_audioMutex);
+        // scope is intentional
+        {
+            LockGuard lock(m_audioMutex);
 
-        int smpIdx = 0;
-        short samples[MBE_SAMPLES_LENGTH];
-        for (uint32_t pcmIdx = 0; pcmIdx < pcmLength; pcmIdx += 2) {
-            samples[smpIdx] = (short)((pcm[pcmIdx + 1] << 8) + pcm[pcmIdx + 0]);
-            smpIdx++;
+            int smpIdx = 0;
+            short samples[MBE_SAMPLES_LENGTH];
+            for (uint32_t pcmIdx = 0; pcmIdx < pcmLength; pcmIdx += 2) {
+                samples[smpIdx] = (short)((pcm[pcmIdx + 1] << 8) + pcm[pcmIdx + 0]);
+                smpIdx++;
+            }
+
+            m_inputAudio.addData(samples, MBE_SAMPLES_LENGTH);
         }
-
-        m_inputAudio.addData(samples, MBE_SAMPLES_LENGTH);
 
         m_trafficFromUDP = true;
 
@@ -2013,8 +2016,6 @@ void HostBridge::encodeP25AudioFrame(uint8_t* pcm, uint32_t forcedSrcId, uint32_
 
 void HostBridge::generatePreambleTone()
 {
-    std::lock_guard<std::mutex> lock(m_audioMutex);
-
     uint64_t frameCount = SampleTimeConvert::ToSamples(SAMPLE_RATE, 1, m_preambleLength);
     if (frameCount > m_outputAudio.freeSpace()) {
         ::LogError(LOG_HOST, "failed to generate preamble tone");
@@ -2026,6 +2027,8 @@ void HostBridge::generatePreambleTone()
     uint8_t* sine = __sine.get();
 
     ma_waveform_read_pcm_frames(&m_maSineWaveform, sine, frameCount, NULL);
+
+    LockGuard lock(m_audioMutex);
 
     int smpIdx = 0;
     std::unique_ptr<short[]> __UNIQUE_sineSamples = std::make_unique<short[]>(frameCount);
@@ -2085,7 +2088,7 @@ void* HostBridge::threadAudioProcess(void* arg)
 
             // scope is intentional
             {
-                std::lock_guard<std::mutex> lock(m_audioMutex);
+                LockGuard lock(m_audioMutex);
 
                 if (bridge->m_inputAudio.dataSize() >= MBE_SAMPLES_LENGTH) {
                     short samples[MBE_SAMPLES_LENGTH];
@@ -2282,7 +2285,7 @@ void* HostBridge::threadNetworkProcess(void* arg)
             uint32_t length = 0U;
             bool netReadRet = false;
             if (bridge->m_txMode == TX_MODE_DMR) {
-                std::lock_guard<std::mutex> lock(HostBridge::m_networkMutex);
+                LockGuard lock(m_networkMutex);
                 UInt8Array dmrBuffer = bridge->m_network->readDMR(netReadRet, length);
                 if (netReadRet) {
                     bridge->processDMRNetwork(dmrBuffer.get(), length);
@@ -2290,7 +2293,7 @@ void* HostBridge::threadNetworkProcess(void* arg)
             }
 
             if (bridge->m_txMode == TX_MODE_P25) {
-                std::lock_guard<std::mutex> lock(HostBridge::m_networkMutex);
+                LockGuard lock(m_networkMutex);
                 UInt8Array p25Buffer = bridge->m_network->readP25(netReadRet, length);
                 if (netReadRet) {
                     bridge->processP25Network(p25Buffer.get(), length);

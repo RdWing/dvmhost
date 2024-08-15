@@ -199,7 +199,7 @@ void* Host::threadP25Writer(void* arg)
 
                 // scope is intentional
                 {
-                    std::lock_guard<std::mutex> lock(m_clockingMutex);
+                    LockGuard lock(m_clockingMutex);
 
                     // ------------------------------------------------------
                     //  -- Write to Modem Processing                      --

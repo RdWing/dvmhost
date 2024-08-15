@@ -32,6 +32,7 @@
 #include "common/lookups/RadioIdLookup.h"
 #include "common/lookups/TalkgroupRulesLookup.h"
 #include "common/p25/SiteData.h"
+#include "common/Mutex.h"
 #include "common/RingBuffer.h"
 #include "common/StopWatch.h"
 #include "common/Timer.h"
@@ -47,7 +48,6 @@
 #include <vector>
 #include <unordered_map>
 #include <random>
-#include <mutex>
 
 namespace p25
 {
@@ -313,7 +313,7 @@ namespace p25
 
         RingBuffer<uint8_t> m_txImmQueue;
         RingBuffer<uint8_t> m_txQueue;
-        static std::mutex m_queueLock;
+        static Mutex m_queueLock;
 
         RPT_RF_STATE m_rfState;
         uint32_t m_rfLastDstId;

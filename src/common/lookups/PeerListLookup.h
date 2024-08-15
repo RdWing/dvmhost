@@ -28,7 +28,6 @@
 
 #include <string>
 #include <vector>
-#include <mutex>
 
 namespace lookups
 {
@@ -212,7 +211,7 @@ namespace lookups
     private:
         Mode m_mode;
 
-        static std::mutex m_mutex;
+        static Mutex m_mutex;
     };
 } // namespace lookups
 

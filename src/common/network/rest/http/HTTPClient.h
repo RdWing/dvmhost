@@ -17,6 +17,7 @@
 #include "common/Defines.h"
 #include "common/network/rest/http/ClientConnection.h"
 #include "common/network/rest/http/HTTPRequestHandler.h"
+#include "common/Mutex.h"
 #include "common/Thread.h"
 
 #include <thread>
@@ -24,7 +25,6 @@
 #include <signal.h>
 #include <utility>
 #include <memory>
-#include <mutex>
 
 #include <asio.hpp>
 
@@ -100,8 +100,9 @@ namespace network
                     }
 
                     asio::post(m_ioContext, [this, request]() {
-                        std::lock_guard<std::mutex> guard(m_lock);
+                        // scope is intentional
                         {
+                            LockGuard lock(m_lock);
                             if (m_connection != nullptr) {
                                 m_connection->send(request);
                             }
@@ -191,7 +192,7 @@ namespace network
 
                 RequestHandlerType m_requestHandler;
 
-                std::mutex m_lock;
+                Mutex m_lock;
             };
         } // namespace http
     } // namespace rest

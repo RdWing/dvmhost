@@ -208,7 +208,7 @@ void* Host::threadDMRWriter1(void* arg)
 
                 // scope is intentional
                 {
-                    std::lock_guard<std::mutex> lock(m_clockingMutex);
+                    LockGuard lock(m_clockingMutex);
 
                     // ------------------------------------------------------
                     //  -- Write to Modem Processing                      --
@@ -468,7 +468,7 @@ void* Host::threadDMRWriter2(void* arg)
 
                 // scope is intentional
                 {
-                    std::lock_guard<std::mutex> lock(m_clockingMutex);
+                    LockGuard lock(m_clockingMutex);
 
                     // ------------------------------------------------------
                     //  -- Write to Modem Processing                      --

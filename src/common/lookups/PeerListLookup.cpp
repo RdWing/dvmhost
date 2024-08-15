@@ -22,7 +22,7 @@ using namespace lookups;
 //  Static Class Members
 // ---------------------------------------------------------------------------
 
-std::mutex PeerListLookup::m_mutex;
+Mutex PeerListLookup::m_mutex;
 
 // ---------------------------------------------------------------------------
 //  Public Class Members
@@ -40,7 +40,7 @@ PeerListLookup::PeerListLookup(const std::string& filename, Mode mode, uint32_t 
 
 void PeerListLookup::clear()
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    LockGuard lock(m_mutex);
     m_table.clear();
 }
 
@@ -50,7 +50,7 @@ void PeerListLookup::addEntry(uint32_t id, const std::string& password)
 {
     PeerId entry = PeerId(id, password, false);
 
-    std::lock_guard<std::mutex> lock(m_mutex);
+    LockGuard lock(m_mutex);
     try {
         PeerId _entry = m_table.at(id);
         // if either the alias or the enabled flag doesn't match, update the entry
@@ -67,7 +67,7 @@ void PeerListLookup::addEntry(uint32_t id, const std::string& password)
 
 void PeerListLookup::eraseEntry(uint32_t id)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    LockGuard lock(m_mutex);
     try {
         PeerId entry = m_table.at(id);  // this value will get discarded
         (void)entry;                    // but some variants of C++ mark the unordered_map<>::at as nodiscard
@@ -83,7 +83,7 @@ PeerId PeerListLookup::find(uint32_t id)
 {
     PeerId entry;
 
-    std::lock_guard<std::mutex> lock(m_mutex);
+    LockGuard lock(m_mutex);
     try {
         entry = m_table.at(id);
     } catch (...) {
@@ -111,7 +111,7 @@ bool PeerListLookup::getACL() const
 
 bool PeerListLookup::isPeerInList(uint32_t id) const
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    LockGuard lock(m_mutex);
     if (m_table.find(id) != m_table.end()) {
         return true;
     }
@@ -141,7 +141,7 @@ bool PeerListLookup::isPeerAllowed(uint32_t id) const
 
 void PeerListLookup::setMode(Mode mode)
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    LockGuard lock(m_mutex);
     m_mode = mode;
 }
 
@@ -171,7 +171,7 @@ bool PeerListLookup::load()
     }
 
     m_table.clear();
-    std::lock_guard<std::mutex> lock(m_mutex);
+    LockGuard lock(m_mutex);
 
     // read lines from file
     std::string line;
@@ -242,7 +242,7 @@ bool PeerListLookup::save()
     // Counter for lines written
     unsigned int lines = 0;
 
-    std::lock_guard<std::mutex> lock(m_mutex);
+    LockGuard lock(m_mutex);
 
     // String for writing
     std::string line;

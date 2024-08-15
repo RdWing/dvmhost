@@ -22,7 +22,7 @@ using namespace network;
 //  Static Class Members
 // ---------------------------------------------------------------------------
 
-std::mutex RawFrameQueue::m_flushMutex;
+Mutex RawFrameQueue::m_flushMutex;
 
 // ---------------------------------------------------------------------------
 //  Public Class Members
@@ -126,7 +126,7 @@ void RawFrameQueue::enqueueMessage(const uint8_t* message, uint32_t length, sock
 bool RawFrameQueue::flushQueue()
 {
     bool ret = true;
-    std::lock_guard<std::mutex> lock(m_flushMutex);
+    LockGuard lock(m_flushMutex);
 
     if (m_buffers.empty()) {
         return false;

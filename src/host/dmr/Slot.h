@@ -25,6 +25,7 @@
 #include "common/lookups/TalkgroupRulesLookup.h"
 #include "common/RingBuffer.h"
 #include "common/StopWatch.h"
+#include "common/Mutex.h"
 #include "common/Timer.h"
 #include "dmr/Control.h"
 #include "dmr/lookups/DMRAffiliationLookup.h"
@@ -35,7 +36,6 @@
 #include "network/Network.h"
 
 #include <vector>
-#include <mutex>
 
 namespace dmr
 {
@@ -308,7 +308,7 @@ namespace dmr
 
         RingBuffer<uint8_t> m_txImmQueue;
         RingBuffer<uint8_t> m_txQueue;
-        std::mutex m_queueLock;
+        Mutex m_queueLock;
 
         RPT_RF_STATE m_rfState;
         uint32_t m_rfLastDstId;

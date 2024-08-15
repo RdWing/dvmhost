@@ -34,6 +34,7 @@
 #include "common/lookups/TalkgroupRulesLookup.h"
 #include "common/network/json/json.h"
 #include "common/yaml/Yaml.h"
+#include "common/Mutex.h"
 #include "dmr/Control.h"
 #include "p25/Control.h"
 #include "nxdn/Control.h"
@@ -45,7 +46,6 @@
 #include <string>
 #include <unordered_map>
 #include <functional>
-#include <mutex>
 
 #if defined(_WIN32)
 #define WIN32_LEAN_AND_MEAN
@@ -201,7 +201,7 @@ private:
     uint32_t m_adjSiteLoopMS;
     Timer m_adjSiteLoopWatchdogTimer;
 
-    static std::mutex m_clockingMutex;
+    static Mutex m_clockingMutex;
 
     static uint8_t m_activeTickDelay;
     static uint8_t m_idleTickDelay;

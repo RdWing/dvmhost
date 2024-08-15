@@ -561,7 +561,7 @@ void Modem::clock(uint32_t ms)
         case CMD_DMR_DATA1:
         {
             if (m_dmrEnabled) {
-                std::lock_guard<std::mutex> lock(m_dmr1ReadLock);
+                LockGuard lock(m_dmr1ReadLock);
 
                 if (m_rspDoubleLength) {
                     LogError(LOG_MODEM, "CMD_DMR_DATA1 double length?; len = %u", m_length);
@@ -585,7 +585,7 @@ void Modem::clock(uint32_t ms)
         case CMD_DMR_DATA2:
         {
             if (m_dmrEnabled) {
-                std::lock_guard<std::mutex> lock(m_dmr2ReadLock);
+                LockGuard lock(m_dmr2ReadLock);
 
                 if (m_rspDoubleLength) {
                     LogError(LOG_MODEM, "CMD_DMR_DATA2 double length?; len = %u", m_length);
@@ -609,7 +609,7 @@ void Modem::clock(uint32_t ms)
         case CMD_DMR_LOST1:
         {
             if (m_dmrEnabled) {
-                std::lock_guard<std::mutex> lock(m_dmr1ReadLock);
+                LockGuard lock(m_dmr1ReadLock);
 
                 if (m_rspDoubleLength) {
                     LogError(LOG_MODEM, "CMD_DMR_LOST1 double length?; len = %u", m_length);
@@ -628,7 +628,7 @@ void Modem::clock(uint32_t ms)
         case CMD_DMR_LOST2:
         {
             if (m_dmrEnabled) {
-                std::lock_guard<std::mutex> lock(m_dmr2ReadLock);
+                LockGuard lock(m_dmr2ReadLock);
 
                 if (m_rspDoubleLength) {
                     LogError(LOG_MODEM, "CMD_DMR_LOST2 double length?; len = %u", m_length);
@@ -648,7 +648,7 @@ void Modem::clock(uint32_t ms)
         case CMD_P25_DATA:
         {
             if (m_p25Enabled) {
-                std::lock_guard<std::mutex> lock(m_p25ReadLock);
+                LockGuard lock(m_p25ReadLock);
 
                 uint8_t length[2U];
                 if (m_length > 255U)
@@ -669,7 +669,7 @@ void Modem::clock(uint32_t ms)
         case CMD_P25_LOST:
         {
             if (m_p25Enabled) {
-                std::lock_guard<std::mutex> lock(m_p25ReadLock);
+                LockGuard lock(m_p25ReadLock);
 
                 if (m_rspDoubleLength) {
                     LogError(LOG_MODEM, "CMD_P25_LOST double length?; len = %u", m_length);
@@ -689,7 +689,7 @@ void Modem::clock(uint32_t ms)
         case CMD_NXDN_DATA:
         {
             if (m_nxdnEnabled) {
-                std::lock_guard<std::mutex> lock(m_nxdnReadLock);
+                LockGuard lock(m_nxdnReadLock);
 
                 if (m_rspDoubleLength) {
                     LogError(LOG_MODEM, "CMD_NXDN_DATA double length?; len = %u", m_length);
@@ -710,7 +710,7 @@ void Modem::clock(uint32_t ms)
         case CMD_NXDN_LOST:
         {
             if (m_nxdnEnabled) {
-                std::lock_guard<std::mutex> lock(m_nxdnReadLock);
+                LockGuard lock(m_nxdnReadLock);
 
                 if (m_rspDoubleLength) {
                     LogError(LOG_MODEM, "CMD_NXDN_LOST double length?; len = %u", m_length);
@@ -927,7 +927,7 @@ uint32_t Modem::peekDMRFrame1Length()
 uint32_t Modem::readDMRFrame1(uint8_t* data)
 {
     assert(data != nullptr);
-    std::lock_guard<std::mutex> lock(m_dmr1ReadLock);
+    LockGuard lock(m_dmr1ReadLock);
 
     if (m_rxDMRQueue1.isEmpty())
         return 0U;
@@ -981,7 +981,7 @@ uint32_t Modem::peekDMRFrame2Length()
 uint32_t Modem::readDMRFrame2(uint8_t* data)
 {
     assert(data != nullptr);
-    std::lock_guard<std::mutex> lock(m_dmr2ReadLock);
+    LockGuard lock(m_dmr2ReadLock);
 
     if (m_rxDMRQueue2.isEmpty())
         return 0U;
@@ -1039,7 +1039,7 @@ uint32_t Modem::peekP25FrameLength()
 uint32_t Modem::readP25Frame(uint8_t* data)
 {
     assert(data != nullptr);
-    std::lock_guard<std::mutex> lock(m_p25ReadLock);
+    LockGuard lock(m_p25ReadLock);
 
     if (m_rxP25Queue.isEmpty())
         return 0U;
@@ -1097,7 +1097,7 @@ uint32_t Modem::peekNXDNFrameLength()
 uint32_t Modem::readNXDNFrame(uint8_t* data)
 {
     assert(data != nullptr);
-    std::lock_guard<std::mutex> lock(m_nxdnReadLock);
+    LockGuard lock(m_nxdnReadLock);
 
     if (m_rxNXDNQueue.isEmpty())
         return 0U;
